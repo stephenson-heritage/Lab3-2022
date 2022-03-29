@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,9 +11,13 @@ builder.Services.AddRazorPages();
 var dbmsVersion = new MariaDbServerVersion(builder.Configuration.GetValue<string>("DBMSVersion"));
 var connString = builder.Configuration.GetConnectionString("StoreDBContext");
 
-
 builder.Services.AddDbContext<StoreDBContext>(options =>
 	 options.UseLazyLoadingProxies().UseMySql(connString, dbmsVersion));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+	 .AddEntityFrameworkStores<StoreDBContext>();
+
+
 
 var app = builder.Build();
 
@@ -28,7 +33,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();

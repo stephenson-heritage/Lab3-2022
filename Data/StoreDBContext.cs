@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lab3.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-public class StoreDBContext : DbContext
+public class StoreDBContext : IdentityDbContext
 {
 	public StoreDBContext(DbContextOptions<StoreDBContext> options)
 		 : base(options)
