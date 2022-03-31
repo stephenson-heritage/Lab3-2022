@@ -15,5 +15,5 @@ public class StoreDBContext : IdentityDbContext
 	}
 
 	public DbSet<Product> Product { get; set; }
-	public DbSet<User> User { get; set; }
+	public DbSet<SiteUser> SiteUser { get; set; }
 }

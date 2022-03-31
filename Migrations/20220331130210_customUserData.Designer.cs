@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab3.Migrations
 {
     [DbContext(typeof(StoreDBContext))]
-    [Migration("20220329154348_identity")]
-    partial class identity
+    [Migration("20220331130210_customUserData")]
+    partial class customUserData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -38,41 +38,6 @@ namespace Lab3.Migrations
                     b.HasKey("ProductId");
 
                     b.ToTable("Product");
-                });
-
-            modelBuilder.Entity("Lab3.Models.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("City")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PostalCode")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Province")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("StreetName")
-                        .HasColumnType("longtext");
-
-                    b.Property<int?>("StreetNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -136,6 +101,10 @@ namespace Lab3.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -186,6 +155,8 @@ namespace Lab3.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -269,6 +240,34 @@ namespace Lab3.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Lab3.Models.SiteUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("City")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Province")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("StreetName")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("StreetNumber")
+                        .HasColumnType("int");
+
+                    b.HasDiscriminator().HasValue("SiteUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

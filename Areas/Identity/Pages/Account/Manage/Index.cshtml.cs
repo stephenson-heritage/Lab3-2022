@@ -12,107 +12,135 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Lab3.Areas.Identity.Pages.Account.Manage
 {
-    public class IndexModel : PageModel
-    {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+	public class IndexModel : PageModel
+	{
+		private readonly UserManager<SiteUser> _userManager;
+		private readonly SignInManager<SiteUser> _signInManager;
 
-        public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
+		public IndexModel(
+			 UserManager<SiteUser> userManager,
+			 SignInManager<SiteUser> signInManager)
+		{
+			_userManager = userManager;
+			_signInManager = signInManager;
+		}
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public string Username { get; set; }
+		/// <summary>
+		///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+		///     directly from your code. This API may change or be removed in future releases.
+		/// </summary>
+		public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [TempData]
-        public string StatusMessage { get; set; }
+		/// <summary>
+		///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+		///     directly from your code. This API may change or be removed in future releases.
+		/// </summary>
+		[TempData]
+		public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [BindProperty]
-        public InputModel Input { get; set; }
+		/// <summary>
+		///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+		///     directly from your code. This API may change or be removed in future releases.
+		/// </summary>
+		[BindProperty]
+		public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public class InputModel
-        {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
-        }
+		/// <summary>
+		///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+		///     directly from your code. This API may change or be removed in future releases.
+		/// </summary>
+		public class InputModel
+		{
+			/// <summary>
+			///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+			///     directly from your code. This API may change or be removed in future releases.
+			/// </summary>
+			[Phone]
+			[Display(Name = "Phone Number")]
+			public string Phone { get; set; }
 
-        private async Task LoadAsync(IdentityUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+			[Required]
+			[Display(Name = "Full Name")]
+			public string Name { get; set; }
 
-            Username = userName;
+			[Display(Name = "Street Number")]
+			public int StreetNumber { get; set; }
 
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
-        }
+			[Display(Name = "Street Name")]
+			public string StreetName { get; set; }
 
-        public async Task<IActionResult> OnGetAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+			[Display(Name = "Postal Code")]
+			[RegularExpression(@"^[A-Za-z][0-9][A-Za-z][ ]*[0-9][A-Za-z][0-9]$", ErrorMessage = "Please enter postal code in A1A 1A1 format")]
+			public string PostalCode { get; set; }
 
-            await LoadAsync(user);
-            return Page();
-        }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+			public string City { get; set; }
 
-            if (!ModelState.IsValid)
-            {
-                await LoadAsync(user);
-                return Page();
-            }
+			[Required]
+			public string Province { get; set; }
+		}
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
-            }
+		private async Task LoadAsync(SiteUser user)
+		{
+			var userName = await _userManager.GetUserNameAsync(user);
+			var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
-            return RedirectToPage();
-        }
-    }
+			Username = userName;
+
+			Input = new InputModel
+			{
+				Phone = user.Phone,
+				Name = user.Name,
+				StreetNumber = user.StreetNumber,
+				StreetName = user.StreetName,
+				PostalCode = user.PostalCode,
+				City = user.City,
+				Province = user.Province
+
+			};
+		}
+
+		public async Task<IActionResult> OnGetAsync()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			await LoadAsync(user);
+			return Page();
+		}
+
+		public async Task<IActionResult> OnPostAsync()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				await LoadAsync(user);
+
+				return Page();
+			}
+
+
+			user.Phone = Input.Phone != user.Phone ? Input.Phone : user.Phone;
+			user.Name = Input.Name != user.Name ? Input.Name : user.Name;
+			user.StreetNumber = Input.StreetNumber != user.StreetNumber ? Input.StreetNumber : user.StreetNumber;
+			user.StreetName = Input.StreetName != user.StreetName ? Input.StreetName : user.StreetName;
+			user.City = Input.City != user.City ? Input.City : user.City;
+			user.PostalCode = Input.PostalCode != user.PostalCode ? Input.PostalCode : user.PostalCode;
+			user.Province = Input.Province != user.Province ? Input.Province : user.Province;
+			await _userManager.UpdateAsync(user);
+
+
+			await _signInManager.RefreshSignInAsync(user);
+			StatusMessage = "Your profile has been updated";
+			return RedirectToPage();
+		}
+	}
 }
